@@ -7,10 +7,44 @@ using UnityEngine;
 
 public class PiyoWindow : EditorWindow
 {
-	bool m_dame = true;
+	string lastState = "";
+	string currentState = "";
+	int guiCount = 0;
+	string GetState()
+	{
+		string state = "";
+		GameObject ball = GameObject.Find("MyBall");
+		if (ball != null)
+		{
+			state = "Y = " + ball.transform.position.y;
+		}
+		else
+		{
+			state = "no ball";
+		}
+		return state;
+	}
+	void Update()
+	{
+		currentState = GetState();
+		if (currentState != lastState)
+		{
+			Repaint();
+			lastState = currentState;
+		}
+	}
 	void OnGUI()
 	{
-		GUILayout.Label("Hoge");
+		// ボールの座標が変化している間だけ呼ばれまくる。
+		// ボールが止まると静かになる。（PiyoWindowの再描画されまくりも止まるので負荷も収まる）
+		// ※そもそもOnGUIはGUI操作中にも呼ばれまくられるので、
+		// 　ゲーム監視有無に関係なく「呼ばれまくられることはよくある」想定で作るのが良い。
+		Debug.Log("OnGUI:" + guiCount++);
+
+		// 状態の監視
+		GUILayout.Label(currentState);
+
+		// ボタン
 		if (GUILayout.Button("FugaA"))
 		{
 			Debug.Log("A!!!");
@@ -20,6 +54,7 @@ public class PiyoWindow : EditorWindow
 			Debug.Log("B!!!");
 		}
 
+		// 横並び
 		GUILayout.BeginHorizontal();
 		GUILayout.Button("1");
 		GUILayout.Button("2");
@@ -32,6 +67,7 @@ public class PiyoWindow : EditorWindow
 		GUILayout.Button("6");
 		GUILayout.EndHorizontal();
 
+		// 入れ子
 		H(delegate()
 		{
 			H(delegate()
